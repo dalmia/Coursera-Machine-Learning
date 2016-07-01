@@ -1,4 +1,4 @@
-function y = computeFunctionJ(X, Y, theta);
+function J = computeFunctionJ(X, Y, theta);
 
 % X is the "design matrix" containing out training examples
 % Y is the class labels
