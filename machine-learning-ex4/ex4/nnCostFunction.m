@@ -1,3 +1,19 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @dalmia
+ Watch 4
+  Star 19
+  Fork 32 gopaczewski/coursera-ml
+ Code  Issues 0  Pull requests 1  Wiki  Pulse  Graphs
+Branch: master Find file Copy pathcoursera-ml/mlclass-ex4-005/mlclass-ex4/nnCostFunction.m
+ede8e46  on 19 May 2014
+@gopaczewski gopaczewski Complete assignments for week 1-7; started week 8
+1 contributor
+RawBlameHistory    119 lines (93 sloc)  4.28 KB
 function [J grad] = nnCostFunction(nn_params, ...
                                    input_layer_size, ...
                                    hidden_layer_size, ...
@@ -27,9 +43,9 @@ m = size(X, 1);
 
 % You need to return the following variables correctly
 J = 0;
-
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
+
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
 %               following parts.
@@ -39,13 +55,25 @@ Theta2_grad = zeros(size(Theta2));
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
 
-yd = eye(num_labels);
-y = yd(y, :);
-a2 = sigmoid([ones(m,1) X] * Theta1');
-a3 = sigmoid([ones(m,1) a2] * Theta2');
-Theta1s = Theta1(:, 2:end);
-Theta2s = Theta2(:, 2:end);
-J = -(1/m).*(sum(sum(y .* log(h2) + (1-y) .* log(1 - h2)))) + (lambda/(2*m)).*(sum(sum(Theta1s.^2))+sum(sum(Theta2s.^2)));;
+K = num_labels;
+X = [ones(m,1) X];
+
+for i = 1:m
+	X_i = X(i,:);
+	h_of_Xi = sigmoid( [1 sigmoid(X_i * Theta1')] * Theta2' );
+
+	% if y = 5 then y_i = [0 0 0 0 1 0 0 0 0 0]
+	y_i = zeros(1,K);
+	y_i(y(i)) = 1;
+
+	J = J + sum( -1 * y_i .* log(h_of_Xi) - (1 - y_i) .* log(1 - h_of_Xi) );
+end;
+
+J = 1 / m * J;
+
+% Add regularization term
+
+J = J + (lambda / (2 * m) * (sum(sumsq(Theta1(:,2:input_layer_size+1))) + sum(sumsq(Theta2(:,2:hidden_layer_size+1)))));
 
 %
 % Part 2: Implement the backpropagation algorithm to compute the gradients
@@ -62,37 +90,38 @@ J = -(1/m).*(sum(sum(y .* log(h2) + (1-y) .* log(1 - h2)))) + (lambda/(2*m)).*(s
 %         Hint: We recommend implementing backpropagation using a for-loop
 %               over the training examples if you are implementing it for the
 %               first time.
-%
 
-for i = 1:m
-  a1 = X(i, :);
-  a2 = sigmoid([1 a1] * Theta1');
-  
-end
+delta_accum_1 = zeros(size(Theta1));
+delta_accum_2 = zeros(size(Theta2));
+
+for t = 1:m
+	a_1 = X(t,:);
+	z_2 = a_1 * Theta1';
+	a_2 = [1 sigmoid(z_2)];
+	z_3 = a_2 * Theta2';
+	a_3 = sigmoid(z_3);
+	y_i = zeros(1,K);
+	y_i(y(t)) = 1;
+
+	delta_3 = a_3 - y_i;
+	delta_2 = delta_3 * Theta2 .* sigmoidGradient([1 z_2]);
+
+	delta_accum_1 = delta_accum_1 + delta_2(2:end)' * a_1;
+	delta_accum_2 = delta_accum_2 + delta_3' * a_2;
+end;
+
+Theta1_grad = delta_accum_1 / m;
+Theta2_grad = delta_accum_2 / m;
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
 %               backpropagation. That is, you can compute the gradients for
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
-%
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad(:, 2:input_layer_size+1) = Theta1_grad(:, 2:input_layer_size+1) + lambda / m * Theta1(:, 2:input_layer_size+1);
+Theta2_grad(:, 2:hidden_layer_size+1) = Theta2_grad(:, 2:hidden_layer_size+1) + lambda / m * Theta2(:, 2:hidden_layer_size+1);
 
 % -------------------------------------------------------------
 
@@ -103,3 +132,5 @@ grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 
 end
+Contact GitHub API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Status Help
