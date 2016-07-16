@@ -67,7 +67,7 @@ J = -(1/m).*(sum(sum(y .* log(h2) + (1-y) .* log(1 - h2)))) + (lambda/(2*m)).*(s
 for i = 1:m
   a1 = X(i, :);
   a2 = sigmoid([1 a1] * Theta1');
-
+  
 end
 % Part 3: Implement regularization with the cost function and gradients.
 %
