@@ -132,5 +132,3 @@ grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 
 end
-Contact GitHub API Training Shop Blog About
-© 2016 GitHub, Inc. Terms Privacy Security Status Help
